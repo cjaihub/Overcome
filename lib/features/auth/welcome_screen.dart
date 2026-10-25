@@ -56,7 +56,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                 const SizedBox(height: 16),
                 Row(
                   children: [
-                    Text(Brand.name, style: Theme.of(context).textTheme.titleLarge),
+                    Image.asset(BrandAssets.horizontal(Theme.of(context).brightness), height: 34),
                     const Spacer(),
                     TextButton(
                       onPressed: () => context.push('/sign-in?next=/redeem'),

@@ -5,7 +5,6 @@ import 'package:local_auth/local_auth.dart';
 import 'core/router/app_router.dart';
 import 'core/theme/app_theme.dart';
 import 'core/theme/brand.dart';
-import 'core/widgets/animated_step_icon.dart';
 import 'core/widgets/aurora_background.dart';
 import 'features/settings/settings_controller.dart';
 
@@ -85,7 +84,7 @@ class _AppLockState extends ConsumerState<_AppLock> with WidgetsBindingObserver 
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const AnimatedStepIcon(icon: Icons.lock_rounded, motion: StepIconMotion.breathe),
+                  Image.asset(BrandAssets.mark, width: 112),
                   const SizedBox(height: 16),
                   FilledButton.icon(
                     style: FilledButton.styleFrom(minimumSize: const Size(200, 52)),

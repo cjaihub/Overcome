@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
 import '../theme/brand.dart';
-import '../widgets/animated_step_icon.dart';
 import '../widgets/aurora_background.dart';
 
 class SplashScreen extends StatelessWidget {
@@ -15,13 +14,13 @@ class SplashScreen extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const AnimatedStepIcon(icon: Icons.all_inclusive_rounded, motion: StepIconMotion.pulse, size: 110),
+            Image.asset(BrandAssets.stacked(Theme.of(context).brightness), width: 220)
+                .animate()
+                .fadeIn(duration: Brand.motion)
+                .scale(begin: const Offset(0.92, 0.92), curve: Curves.easeOutBack)
+                .then()
+                .shimmer(duration: 1400.ms, color: Brand.aurora.withValues(alpha: 0.35)),
             const SizedBox(height: 16),
-            Text(
-              Brand.name,
-              style: Theme.of(context).textTheme.displaySmall,
-            ).animate().fadeIn(duration: Brand.motion).slideY(begin: 0.3),
-            const SizedBox(height: 6),
             Text(Brand.tagline, style: Theme.of(context).textTheme.bodyMedium).animate().fadeIn(delay: 300.ms),
           ],
         ),

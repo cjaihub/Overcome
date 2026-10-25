@@ -12,16 +12,16 @@ export const FIELD_TYPES = ["scale", "text", "choice", "multi", "boolean", "numb
 export const FREQUENCIES = ["daily", "weekly", "on_urge"] as const;
 
 export const BRAND_GUIDE = `
-Brand: Overcome — a premium, calm, corporate-grade recovery companion.
+Brand: Ovacome — a premium, calm, corporate-grade recovery companion (deep teal + warm gold).
 Voice: warm, direct, non-judgemental, evidence-informed (CBT, habit science,
 implementation intentions, urge surfing). Never shame. Never diagnose.
 Short sentences. Second person. Concrete actions over abstractions.
 Palette tokens (choose by meaning):
-  aurora  = clarity, recovery (primary)
-  iris    = reflection, depth
+  aurora  = warm gold: clarity, achievement (primary)
+  iris    = teal: reflection, calm, depth
   ember   = energy, urges, momentum
   bloom   = self-compassion, relationships
   success = wins, milestones
-Typography is handled by the app (Sora display, Inter body): keep titles
+Typography is handled by the app (Fraunces display, Inter body): keep titles
 under 32 characters and descriptions under 120 characters.
 `.trim();

@@ -1,28 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-/// Single source of truth for the Overcome brand.
+/// Single source of truth for the Ovacome brand (deep teal + warm gold,
+/// matching the logo set in `assets/brand/`).
 ///
 /// The same token names are sent to the AI plan generator (see
 /// `functions/src/brand.ts`) so generated templates can only reference
 /// colors and icons that exist here.
 abstract final class Brand {
-  static const name = 'Overcome';
+  static const name = 'Ovacome';
   static const tagline = 'Reclaim your attention. Rebuild your life.';
 
   // Core palette
-  static const ink = Color(0xFF0A1628);
-  static const midnight = Color(0xFF111D33);
-  static const slate = Color(0xFF1B2A44);
-  static const mist = Color(0xFFF5F7FB);
-  static const cloud = Color(0xFFE6EAF2);
+  static const ink = Color(0xFF061B1E); // deepest teal (dark background)
+  static const midnight = Color(0xFF0A2A2E); // logo tile teal (dark surfaces)
+  static const slate = Color(0xFF12403F);
+  static const mist = Color(0xFFFBF6EC); // logo cream (light background)
+  static const cloud = Color(0xFFEFE6D3);
 
-  static const aurora = Color(0xFF2DD4BF); // primary — recovery, clarity
-  static const iris = Color(0xFF7C6CF6); // secondary — reflection, depth
-  static const ember = Color(0xFFF59E5B); // accent — energy, momentum
-  static const bloom = Color(0xFFF472B6); // accent — self-compassion
-  static const success = Color(0xFF34D399);
-  static const danger = Color(0xFFF87171);
+  static const aurora = Color(0xFFE8B04F); // primary — the gold ring of the mark
+  static const iris = Color(0xFF2FA89A); // secondary — teal glow
+  static const ember = Color(0xFFEE8A5B); // accent — energy, urges
+  static const bloom = Color(0xFFE58BA0); // accent — self-compassion
+  static const success = Color(0xFF58C891);
+  static const danger = Color(0xFFF07B6F);
 
   /// Accent tokens the AI agent is allowed to choose from.
   static const accents = <String, Color>{
@@ -38,7 +39,13 @@ abstract final class Brand {
   static const auroraGradient = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
-    colors: [aurora, iris],
+    colors: [Color(0xFFF3CD7E), Color(0xFFD9963A)],
+  );
+
+  static const tealGradient = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [Color(0xFF145650), midnight],
   );
 
   static const emberGradient = LinearGradient(
@@ -56,9 +63,10 @@ abstract final class Brand {
     );
   }
 
-  // Typography: Sora for display, Inter for body.
+  // Typography: Fraunces (a serif echoing the wordmark) for display,
+  // Inter for body.
   static TextTheme textTheme(Color onSurface) {
-    final display = GoogleFonts.soraTextTheme();
+    final display = GoogleFonts.frauncesTextTheme();
     final body = GoogleFonts.interTextTheme();
     return TextTheme(
       displayLarge: display.displayLarge!.copyWith(fontWeight: FontWeight.w700, letterSpacing: -1.5),
@@ -105,4 +113,12 @@ abstract final class Brand {
   static const motionFast = Duration(milliseconds: 220);
   static const motion = Duration(milliseconds: 420);
   static const motionSlow = Duration(milliseconds: 900);
+}
+
+/// Logo assets (1x/2x/3x variants are picked automatically per device).
+abstract final class BrandAssets {
+  static const mark = 'assets/brand/logo_mark.png';
+  static String horizontal(Brightness b) =>
+      'assets/brand/logo_horizontal_${b == Brightness.dark ? 'dark' : 'light'}.png';
+  static String stacked(Brightness b) => 'assets/brand/logo_stacked_${b == Brightness.dark ? 'dark' : 'light'}.png';
 }

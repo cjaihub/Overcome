@@ -223,7 +223,9 @@ class SettingsScreen extends ConsumerWidget {
           ],
         ),
         const SizedBox(height: 24),
-        Center(child: Text('${Brand.name} · v1.0.0', style: text.labelSmall)),
+        Center(child: Image.asset(BrandAssets.horizontal(Theme.of(context).brightness), height: 28)),
+        const SizedBox(height: 6),
+        Center(child: Text('v1.0.0', style: text.labelSmall)),
       ],
     );
   }

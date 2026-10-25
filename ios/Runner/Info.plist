@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>NSFaceIDUsageDescription</key>
-	<string>Use Face ID to lock Overcome and keep your recovery journal private.</string>
+	<string>Use Face ID to lock Ovacome and keep your recovery journal private.</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>audio</string>
@@ -14,7 +14,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>Overcome</string>
+	<string>Ovacome</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>

@@ -10,9 +10,9 @@
     <!-- allowBackup/dataExtraction off: nothing from the app (including any
          cached content) is copied into cloud or device-to-device backups. -->
     <application
-        android:label="Overcome"
+        android:label="Ovacome"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@mipmap/launcher_icon"
         android:allowBackup="false"
         android:fullBackupContent="false"
         android:dataExtractionRules="@xml/data_extraction_rules">
