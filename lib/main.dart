@@ -9,6 +9,8 @@ import 'package:just_audio_background/just_audio_background.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'app.dart';
+import 'core/theme/app_theme.dart';
+import 'core/theme/brand.dart';
 import 'core/router/app_router.dart';
 import 'core/security/screen_security.dart';
 import 'core/services/analytics_service.dart';
@@ -27,6 +29,11 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
 
+  if (DefaultFirebaseOptions.currentPlatform.apiKey == 'REPLACE_ME') {
+    // Built before `flutterfire configure`: show a clear screen, don't crash.
+    runApp(const SetupRequiredApp());
+    return;
+  }
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   // App Check: only genuine, untampered builds can reach Firestore,
   // Storage and Functions.
@@ -51,4 +58,33 @@ Future<void> main() async {
   container.read(wakeWordProvider).start();
 
   runApp(UncontrolledProviderScope(container: container, child: const OvercomeApp()));
+}
+
+class SetupRequiredApp extends StatelessWidget {
+  const SetupRequiredApp({super.key});
+
+  @override
+  Widget build(BuildContext context) => MaterialApp(
+    debugShowCheckedModeBanner: false,
+    theme: AppTheme.dark(),
+    home: Scaffold(
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(32),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Image.asset(BrandAssets.stacked(Brightness.dark), width: 200),
+              const SizedBox(height: 24),
+              const Text(
+                'This build isn\'t connected to a Firebase project yet.\n'
+                'Run `flutterfire configure` and rebuild.',
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        ),
+      ),
+    ),
+  );
 }

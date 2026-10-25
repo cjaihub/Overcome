@@ -1,8 +1,20 @@
+import java.io.FileInputStream
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
 }
+
+// Upload-key signing: android/key.properties locally, or env vars in CI
+// (see .github/workflows/android-release.yml). Never commit the keystore.
+val keyProps = Properties().apply {
+    val f = rootProject.file("key.properties")
+    if (f.exists()) load(FileInputStream(f))
+}
+fun signingValue(name: String, env: String): String? = keyProps.getProperty(name) ?: System.getenv(env)
+val releaseStore = signingValue("storeFile", "ANDROID_KEYSTORE_PATH")
 
 android {
     namespace = "com.overcome.overcome"
@@ -27,10 +39,22 @@ android {
         versionName = flutter.versionName
     }
 
+    signingConfigs {
+        if (releaseStore != null) {
+            create("release") {
+                storeFile = file(releaseStore)
+                storePassword = signingValue("storePassword", "ANDROID_KEYSTORE_PASSWORD")
+                keyAlias = signingValue("keyAlias", "ANDROID_KEY_ALIAS")
+                keyPassword = signingValue("keyPassword", "ANDROID_KEY_PASSWORD")
+            }
+        }
+    }
+
     buildTypes {
         release {
-            // Replace with your upload keystore before publishing to Play.
-            signingConfig = signingConfigs.getByName("debug")
+            // Signed with the upload key when configured; otherwise debug-signed
+            // so test builds still install (Play rejects debug-signed bundles).
+            signingConfig = signingConfigs.findByName("release") ?: signingConfigs.getByName("debug")
             // R8 shrinking + obfuscation makes reverse-engineering the
             // decryption path harder. Pair with `flutter build --obfuscate`.
             isMinifyEnabled = true

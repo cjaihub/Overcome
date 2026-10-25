@@ -1,6 +1,6 @@
-# Overcome
+# Ovacome
 
-A self-discovery and digital-addiction recovery app for **Android and iOS**, built with **Flutter** and **Firebase**. It also includes a protected library of PDF books and read-along audiobooks.
+**Ovacome** is a self-discovery and digital-addiction recovery app for **Android and iOS**, built with **Flutter** and **Firebase**. It also includes a protected library of PDF books and read-along audiobooks.
 
 - **Identity-first onboarding.** A 10-step wizard. Every screen has an animated icon or live infographic, then a title, a description and the input. Answers save as the user types, and a final review step lets them correct anything.
 - **Live AI plan agent.** After onboarding, an agent first looks for an existing template that fits the user's profile. If none fits, it asks Claude to write a new plan. The plan can only use the brand's colours and icons. The user watches each step happen live.
@@ -10,6 +10,12 @@ A self-discovery and digital-addiction recovery app for **Android and iOS**, bui
 - **Access and payments.** Phone-number sign-in with an SMS one-time code. A 7-day free trial, given once per phone number. Monthly and yearly subscriptions, single-book purchases, and one-time unlock codes. Every purchase is checked on the server.
 - **Owner dashboard.** For admin accounts: total users, daily active users, subscribers, trials, engagement mix and capture attempts. You can drill into any single user to see their usage, their recovery trend and a full activity log.
 - **Settings.** Theme, daily reminder time, default narrator and speed, background audio, biometric app lock, haptics and account deletion.
+
+- **Live tracker (Android).** Real screen time, pickups, notifications and late-night use, taken from Android's usage log and refreshed every 15 seconds. Includes a live timer for the app you're in right now, a focus score, an hour-by-hour chart, written insights, per-app usage with icons, and weekly trends against your target.
+- **Guardian mode.** A background service that checks usage every 30 seconds, even when the app is closed. It nudges you after a long session in a watched app, when you hit your daily limit, during your late-night window, and after a burst of unlocks. Nudges arrive as notifications that open the right screen, and can be spoken aloud using your name.
+- **AI coach chat.** Text, voice, camera or gallery photos, links that open in in-app browser tabs, and buttons that jump to app screens. The coach knows your plan, your check-ins and your real usage.
+- **Emotion-aware voice.** Voice messages include speech rate, loudness variation and pauses, measured on the phone. The coach estimates your mood (shown as an estimate), adjusts its tone, and speaks its reply at a matching pace and pitch.
+- **Wake phrase.** Hands-free mode listens for your first name by default, or for any phrase you choose. The assistant's name is also customizable.
 
 ---
 
@@ -116,10 +122,38 @@ flutter run
 flutter build appbundle --release --obfuscate --split-debug-info=build/symbols
 ```
 
+## Building and installing
+
+Releases are built by GitHub Actions (`.github/workflows/android-release.yml`) on every push to the release branch, on `v*` tags, or on demand. Each run produces:
+
+| Artifact | Contents | Use |
+|---|---|---|
+| `ovacome-apks` | `ovacome-arm64-v8a.apk` (most phones), `ovacome-armeabi-v7a.apk` (older phones), `ovacome-x86_64.apk`, `ovacome-universal.apk` | Install directly on any Android 7.0+ device |
+| `ovacome-aab` | `ovacome.aab` | Upload to Google Play |
+| `ovacome-debug` | R8 mapping and Dart symbols | Make crash reports readable (upload to Play / Crashlytics) |
+
+Release builds are shrunk and obfuscated with R8, have unused resources removed, use obfuscated Dart, and are split per CPU type. Version **1.1.0 (build 2)**.
+
+**Before the first real release:**
+1. Run `flutterfire configure`, then either commit `lib/firebase_options.dart` or save it as the `FIREBASE_OPTIONS_DART_B64` secret. (Builds without it install fine, but only show a "setup needed" screen.)
+2. Create an upload key: `keytool -genkey -v -keystore upload.jks -keyalg RSA -keysize 2048 -validity 10000 -alias upload`. Add these secrets: `ANDROID_KEYSTORE_B64` (`base64 -w0 upload.jks`), `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS`, `ANDROID_KEY_PASSWORD`. Without a key, builds are debug-signed. They still install for testing, but Play rejects them.
+3. Optional: add `PLAY_SERVICE_ACCOUNT_JSON` so each signed build uploads to Play's **internal testing** track as a draft.
+
+**Install over Wi-Fi** (on your computer, with `adb` from Android platform-tools):
+```bash
+# On the phone: Developer options → Wireless debugging → ON
+./scripts/install-android.sh pair 192.168.1.20:37099 123456   # from "Pair device with pairing code"
+./scripts/install-android.sh connect 192.168.1.20:41231
+./scripts/install-android.sh install ~/Downloads/ovacome-apks  # picks the right APK for the phone
+```
+Or copy the APK to the phone and open it. You'll need to allow "Install unknown apps" for your file manager or browser.
+
+**Google Play checklist:** a privacy policy URL; the Data safety form (phone number, usage summaries, chat messages and photos, analytics); the **special-use foreground service** declaration for Guardian mode (explain "digital wellbeing reminders", with a short video); an explanation of why the app uses Usage access and the notification listener; a content rating; and screenshots made from the brand assets.
+
 ## Tests
 ```bash
-flutter analyze && flutter test        # app: progress maths, entitlement, encryption round-trip, widgets
-cd functions && npm test               # backend: access, codes, plan validation and schema, encryption format
+flutter analyze && flutter test        # app: progress maths, entitlement, encryption, focus score, wake phrase, voice cues, widgets
+cd functions && npm test               # backend: access, codes, plan/coach schemas, action allowlist, encryption format
 ```
 There is a cross-language test: a file encrypted by `encrypt-book.ts` is decrypted by the app's Dart code. Tampered files and wrong keys are rejected.
 
@@ -137,10 +171,15 @@ There is a cross-language test: a file encrypted by `encrypt-book.ts` is decrypt
 | Trial abuse | One trial per phone number, enforced on the server (stored as a hash). |
 | Shared receipts or codes | A store purchase or a code can only unlock one account. |
 
+**Privacy of the tracker:** usage events are read on the phone. Only daily totals, hourly minutes and the names of the most-used apps are synced to `users/{uid}/usage`. The notification listener records which app posted a notification and when, and never the title, text or sender. Voice is transcribed by the phone's speech engine; only the transcript and four numeric voice cues reach the coach.
+
 **Limits to know about:**
 - **A camera pointed at the screen cannot be blocked by any app.** The faint per-user watermark (account ID, masked phone number and time) on every protected page lets you trace leaked photos.
 - The iOS secure-layer technique relies on how iOS currently handles secure text fields, not on a documented API for this purpose. Re-test it on each major iOS release.
 - Rooted or jailbroken devices with hooking tools can get around any app-level protection. App Check (Play Integrity / App Attest) makes this much harder but not impossible.
+- **iOS cannot provide the live tracker or Guardian mode.** Apple only shares app usage with apps approved for its Family Controls entitlement, and it doesn't let apps read other apps' notifications. On iPhone, the tracker shows check-ins and in-app activity instead.
+- **The wake phrase only works while Ovacome is open.** Always-on wake words with the app closed need a dedicated on-device engine, such as Picovoice Porcupine with a custom keyword.
+- Emotion is an **estimate** based on wording and simple voice measurements. It is not a clinical assessment, and the app labels it that way.
 - Audiobooks are streamed from short-lived signed URLs and are not encrypted at rest in Storage. For stronger protection, encrypt the audio too and play it through a decrypting stream source.
 
 ## Analytics collected
