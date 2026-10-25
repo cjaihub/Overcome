@@ -1,0 +1,21 @@
+{
+  "indexes": [
+    {
+      "collectionGroup": "books",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "published", "order": "ASCENDING" },
+        { "fieldPath": "order", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "users",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "settings.reminders", "order": "ASCENDING" },
+        { "fieldPath": "settings.reminderUtcHour", "order": "ASCENDING" }
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}

@@ -1,0 +1,81 @@
+rules_version = '2';
+
+// Principles
+//  * Users read/write only their own data, and never their entitlement,
+//    stats or phone (written by Cloud Functions with the Admin SDK).
+//  * Book encryption keys (bookSecrets), access codes, store purchases and
+//    the trial registry are server-only.
+//  * Accounts with the `admin` custom claim can read everything needed for
+//    the owner dashboard, but cannot write user data from the client.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() { return request.auth != null; }
+    function isAdmin() { return signedIn() && request.auth.token.admin == true; }
+    function isOwner(uid) { return signedIn() && request.auth.uid == uid; }
+    function onlyChanges(keys) {
+      return request.resource.data.diff(resource.data).affectedKeys().hasOnly(keys);
+    }
+
+    match /users/{uid} {
+      allow read: if isOwner(uid) || isAdmin();
+      // Created by bootstrapUser; clients may only edit these fields.
+      allow update: if isOwner(uid)
+        && onlyChanges(['profile', 'onboardingCompletedAt', 'settings', 'fcmTokens']);
+      allow create: if isOwner(uid)
+        && request.resource.data.keys().hasOnly(['profile', 'onboardingCompletedAt', 'settings', 'fcmTokens']);
+
+      match /private/{doc} {
+        allow read, write: if isOwner(uid);
+      }
+
+      match /plan/{doc} {
+        allow read: if isOwner(uid) || isAdmin();
+        allow write: if false; // assigned by runPlanAgent
+      }
+
+      match /agentRuns/{runId} {
+        allow read: if isOwner(uid) || isAdmin();
+        // The app may only queue a run; the agent writes progress.
+        allow create: if isOwner(uid)
+          && request.resource.data.status == 'queued'
+          && request.resource.data.keys().hasOnly(['status', 'steps', 'createdAt']);
+      }
+
+      match /checkIns/{id} {
+        allow read: if isOwner(uid) || isAdmin();
+        allow create: if isOwner(uid)
+          && request.resource.data.keys().hasOnly(['formId', 'formTitle', 'answers', 'mood', 'at'])
+          && request.resource.data.at == request.time;
+      }
+
+      match /events/{id} {
+        allow read: if isAdmin();
+        allow create: if isOwner(uid)
+          && request.resource.data.keys().hasOnly(['type', 'props', 'sessionId', 'at'])
+          && request.resource.data.type is string
+          && request.resource.data.at == request.time;
+      }
+    }
+
+    match /books/{bookId} {
+      allow read: if signedIn() && (resource.data.published == true || isAdmin());
+      allow write: if false;
+    }
+
+    match /templates/{id} {
+      allow read, write: if isAdmin(); // promote generated → approved from the console
+    }
+
+    match /metrics/{path=**} {
+      allow read: if isAdmin();
+      allow write: if false;
+    }
+
+    // Server-only collections.
+    match /bookSecrets/{id} { allow read, write: if false; }
+    match /accessCodes/{id} { allow read, write: if false; }
+    match /storePurchases/{id} { allow read, write: if false; }
+    match /trialRegistry/{id} { allow read, write: if false; }
+  }
+}

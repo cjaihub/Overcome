@@ -1,0 +1,16 @@
+rules_version = '2';
+
+// Encrypted book files are never readable directly: the app receives
+// 10-minute signed URLs from getBookAccess (which bypass these rules) only
+// when the user is entitled. Covers are public marketing images.
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /covers/{file} {
+      allow read: if true;
+      allow write: if false;
+    }
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}
