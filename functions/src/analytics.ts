@@ -9,6 +9,7 @@ export const EVENT_TYPES = new Set([
   "app_open", "session_end", "onboarding_step", "onboarding_complete", "plan_assigned", "form_submit",
   "book_view", "book_open", "pdf_page_view", "audio_play", "audio_complete", "read_along_start",
   "ai_narration", "paywall_view", "purchase", "code_redeemed", "capture_attempt",
+  "nudge_sent", "wake_word", "coach_message", "voice_check_in",
 ]);
 
 /**

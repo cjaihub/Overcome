@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../features/admin/admin_dashboard_screen.dart';
 import '../../features/admin/admin_user_detail_screen.dart';
 import '../../features/auth/phone_sign_in_screen.dart';
+import '../../features/coach/coach_screen.dart';
 import '../../features/auth/redeem_code_screen.dart';
 import '../../features/auth/welcome_screen.dart';
 import '../../features/home/dashboard_screen.dart';
@@ -96,6 +97,10 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/book/:id/narrator',
         builder: (_, s) => AiNarratorScreen(bookId: s.pathParameters['id']!),
       ),
+      GoRoute(
+        path: '/coach',
+        builder: (_, s) => CoachScreen(startVoice: s.uri.queryParameters['voice'] == '1'),
+      ),
       GoRoute(path: '/admin', builder: (_, _) => const AdminDashboardScreen()),
       GoRoute(
         path: '/admin/user/:uid',
@@ -109,6 +114,9 @@ final routerProvider = Provider<GoRouter>((ref) {
           ),
           StatefulShellBranch(
             routes: [GoRoute(path: '/progress', builder: (_, _) => const ProgressScreen())],
+          ),
+          StatefulShellBranch(
+            routes: [GoRoute(path: '/chat', builder: (_, _) => const CoachScreen())],
           ),
           StatefulShellBranch(
             routes: [GoRoute(path: '/library', builder: (_, _) => const LibraryScreen())],

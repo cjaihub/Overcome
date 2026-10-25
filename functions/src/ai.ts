@@ -38,6 +38,27 @@ export async function generateJson<T>(opts: {
   return JSON.parse(text) as T;
 }
 
+/** Structured output over a full conversation (used by the coach chat). */
+export async function generateStructured<T>(opts: {
+  system: string;
+  messages: Anthropic.Beta.Messages.BetaMessageParam[];
+  schema: Record<string, unknown>;
+  effort?: "low" | "medium" | "high";
+}): Promise<T> {
+  const res = await claude().beta.messages.create({
+    model: MODEL,
+    max_tokens: 8000,
+    betas: ["server-side-fallback-2026-07-01"],
+    fallbacks: "default",
+    system: opts.system,
+    messages: opts.messages,
+    output_config: { effort: opts.effort ?? "medium", format: { type: "json_schema", schema: opts.schema } },
+  });
+  if (res.stop_reason === "refusal") throw new HttpsError("failed-precondition", "The AI declined this message.");
+  if (res.stop_reason === "max_tokens") throw new HttpsError("resource-exhausted", "The AI response was cut off.");
+  return JSON.parse(res.content.flatMap((b) => (b.type === "text" ? [b.text] : [])).join("")) as T;
+}
+
 /** Plain-text generation (used by the narrator). */
 export async function generateText(opts: { system: string; prompt: string; effort?: "low" | "medium" }): Promise<string> {
   const res = await claude().beta.messages.create({

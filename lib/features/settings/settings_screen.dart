@@ -9,6 +9,7 @@ import '../../core/theme/brand.dart';
 import '../../core/widgets/common.dart';
 import '../auth/auth_repository.dart';
 import '../subscription/entitlement.dart';
+import '../tracker/guardian_settings_section.dart';
 import 'settings_controller.dart';
 
 class SettingsScreen extends ConsumerWidget {
@@ -126,6 +127,7 @@ class SettingsScreen extends ConsumerWidget {
             ),
           ],
         ),
+        const GuardianSettingsSection(),
         const SectionTitle('Reading & listening'),
         _Group(
           children: [

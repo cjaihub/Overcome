@@ -19,6 +19,7 @@ class HomeShell extends StatelessWidget {
       destinations: const [
         NavigationDestination(icon: Icon(Icons.wb_twilight_rounded), label: 'Today'),
         NavigationDestination(icon: Icon(Icons.insights_rounded), label: 'Progress'),
+        NavigationDestination(icon: Icon(Icons.forum_rounded), label: 'Coach'),
         NavigationDestination(icon: Icon(Icons.auto_stories_rounded), label: 'Library'),
         NavigationDestination(icon: Icon(Icons.tune_rounded), label: 'Settings'),
       ],

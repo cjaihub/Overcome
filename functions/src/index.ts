@@ -5,3 +5,4 @@ export { verifyPurchase, playBillingNotifications, appStoreNotifications } from 
 export { runPlanAgent } from "./plan";
 export { narratePassage } from "./narrate";
 export { aggregateEvent, recountMetrics, dailyNudge } from "./analytics";
+export { coachReply } from "./coach";

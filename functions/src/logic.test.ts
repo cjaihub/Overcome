@@ -85,3 +85,28 @@ test("book encryption matches the app's [nonce][ciphertext][tag] layout", () => 
   d.setAuthTag(blob.subarray(blob.length - 16));
   assert.deepEqual(Buffer.concat([d.update(blob.subarray(12, blob.length - 16)), d.final()]), plain);
 });
+
+import { coachSchema, sanitizeActions } from "./coach";
+
+test("coach actions: only allowlisted routes and https links survive", () => {
+  const out = sanitizeActions([
+    { type: "route", label: "Log urge", target: "/form/urge_log" },
+    { type: "route", label: "Admin", target: "/admin" },
+    { type: "url", label: "Helpline", target: "https://findahelpline.com" },
+    { type: "url", label: "Bad", target: "javascript:alert(1)" },
+    { type: "route", label: "Book", target: "/book/quiet-mind/listen" },
+  ]);
+  assert.deepEqual(out.map((a) => a.target), ["/form/urge_log", "https://findahelpline.com", "/book/quiet-mind/listen"]);
+});
+
+test("coach schema is valid for structured outputs (closed objects, all fields required)", () => {
+  const walk = (n: any): void => {
+    if (!n || typeof n !== "object") return;
+    if (n.type === "object") {
+      assert.equal(n.additionalProperties, false);
+      assert.deepEqual([...n.required].sort(), Object.keys(n.properties).sort());
+    }
+    Object.values(n).forEach(walk);
+  };
+  walk(coachSchema);
+});

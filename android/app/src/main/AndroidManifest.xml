@@ -1,4 +1,5 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.WAKE_LOCK"/>
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
@@ -6,6 +7,12 @@
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
     <uses-permission android:name="android.permission.USE_BIOMETRIC"/>
     <uses-permission android:name="com.android.vending.BILLING"/>
+    <!-- Usage tracking & Guardian mode (user grants Usage access in Settings). -->
+    <uses-permission android:name="android.permission.PACKAGE_USAGE_STATS" tools:ignore="ProtectedPermissions"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE"/>
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+    <!-- Voice coach, wake word and emotion-aware voice check-ins. -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO"/>
 
     <!-- allowBackup/dataExtraction off: nothing from the app (including any
          cached content) is copied into cloud or device-to-device backups. -->
@@ -37,7 +44,39 @@
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
+            <!-- Guardian nudges open a screen directly: ovacome://app/form/urge_log -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data android:scheme="ovacome" android:host="app"/>
+            </intent-filter>
         </activity>
+        <!-- Guardian mode: real-time usage nudges. -->
+        <service
+            android:name=".GuardianService"
+            android:exported="false"
+            android:foregroundServiceType="specialUse">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="Digital wellbeing: monitors the user's own app usage in real time to deliver the screen-time reminders they configured."/>
+        </service>
+        <!-- Counts notifications per app (no content is read or stored). -->
+        <service
+            android:name=".NotificationCounter"
+            android:exported="true"
+            android:label="Ovacome notification insights"
+            android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE">
+            <intent-filter>
+                <action android:name="android.service.notification.NotificationListenerService"/>
+            </intent-filter>
+        </service>
+        <receiver android:name=".BootReceiver" android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+            </intent-filter>
+        </receiver>
+
         <!-- Background audiobook playback (just_audio_background). -->
         <service
             android:name="com.ryanheise.audioservice.AudioService"
@@ -69,6 +108,18 @@
 
          In particular, this is used by the Flutter engine in io.flutter.plugin.text.ProcessTextPlugin. -->
     <queries>
+        <!-- Lets usage insights show names/icons of launchable apps without QUERY_ALL_PACKAGES. -->
+        <intent>
+            <action android:name="android.intent.action.MAIN"/>
+            <category android:name="android.intent.category.LAUNCHER"/>
+        </intent>
+        <intent>
+            <action android:name="android.speech.RecognitionService"/>
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.VIEW"/>
+            <data android:scheme="https"/>
+        </intent>
         <intent>
             <action android:name="android.intent.action.PROCESS_TEXT"/>
             <data android:mimeType="text/plain"/>

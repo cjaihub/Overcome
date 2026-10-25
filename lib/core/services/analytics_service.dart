@@ -29,6 +29,10 @@ enum AppEvent {
   purchase,
   codeRedeemed,
   captureAttempt,
+  nudgeSent,
+  wakeWord,
+  coachMessage,
+  voiceCheckIn,
 }
 
 extension on AppEvent {

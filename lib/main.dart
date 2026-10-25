@@ -13,7 +13,9 @@ import 'core/router/app_router.dart';
 import 'core/security/screen_security.dart';
 import 'core/services/analytics_service.dart';
 import 'core/services/push_service.dart';
+import 'features/coach/wake_word_service.dart';
 import 'features/settings/settings_controller.dart';
+import 'features/tracker/usage_sync.dart';
 import 'firebase_options.dart';
 
 @pragma('vm:entry-point')
@@ -45,6 +47,8 @@ Future<void> main() async {
   final container = ProviderContainer(overrides: [sharedPrefsProvider.overrideWithValue(prefs)]);
   container.read(analyticsProvider).start();
   PushService(container.read(routerProvider)).start();
+  container.read(usageSyncProvider).start();
+  container.read(wakeWordProvider).start();
 
   runApp(UncontrolledProviderScope(container: container, child: const OvercomeApp()));
 }

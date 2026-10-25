@@ -2,6 +2,23 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Talk to your Ovacome coach and use hands-free wake phrases.</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>Turns what you say into text for your coach and detects your wake phrase.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Take a photo to share with your coach.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Choose a photo to share with your coach.</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>ovacome</string>
+			</array>
+		</dict>
+	</array>
 	<key>NSFaceIDUsageDescription</key>
 	<string>Use Face ID to lock Ovacome and keep your recovery journal private.</string>
 	<key>UIBackgroundModes</key>

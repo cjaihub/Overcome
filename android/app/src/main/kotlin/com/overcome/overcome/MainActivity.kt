@@ -29,6 +29,7 @@ class MainActivity : AudioServiceFragmentActivity() {
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
+        flutterEngine.plugins.add(UsagePlugin())
         val messenger = flutterEngine.dartExecutor.binaryMessenger
 
         MethodChannel(messenger, "overcome/security").setMethodCallHandler { call, result ->

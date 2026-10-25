@@ -49,6 +49,21 @@ service cloud.firestore {
           && request.resource.data.at == request.time;
       }
 
+      // Coach chat: written only by the coachReply function (history can't be forged).
+      match /coach/{id} {
+        allow read: if isOwner(uid);
+        allow write: if false;
+      }
+
+      // Daily usage summaries synced from the device (totals and app names only).
+      match /usage/{day} {
+        allow read: if isOwner(uid) || isAdmin();
+        allow write: if isOwner(uid)
+          && day.matches('^[0-9]{8}$')
+          && request.resource.data.keys().hasOnly(['totalMin', 'screenOnMin', 'pickups', 'notifications',
+               'lateNightMin', 'focusScore', 'targetMin', 'hourlyMin', 'topApps', 'updatedAt']);
+      }
+
       match /events/{id} {
         allow read: if isAdmin();
         allow create: if isOwner(uid)

@@ -9,6 +9,13 @@ service firebase.storage {
       allow read: if true;
       allow write: if false;
     }
+    // Photos a user shares with their coach: private to them, images only, ≤ 5 MB.
+    match /users/{uid}/chat/{file} {
+      allow read: if request.auth != null && request.auth.uid == uid;
+      allow create: if request.auth != null && request.auth.uid == uid
+        && request.resource.size < 5 * 1024 * 1024
+        && request.resource.contentType.matches('image/.*');
+    }
     match /{allPaths=**} {
       allow read, write: if false;
     }
